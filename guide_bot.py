@@ -42,15 +42,78 @@ pending_payments = {}
 @dp.message(Command("start"))
 async def cmd_start(message: types.Message):
     """Приветственное сообщение"""
+    keyboard = InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(text="💳 Купить за 390₽", callback_data="buy_guide")]
+    ])
+    
     await message.answer(
         "👋 Привет!\n\n"
         "🌸 <b>7 дней к внутреннему спокойствию в отношениях</b>\n\n"
         "Одна практика в день. 10-15 минут. Неделя на то, чтобы "
         "перестать жить его жизнью и вернуться к своей.\n\n"
-        "💰 <b>Цена: 390₽</b>\n\n"
-        "Нажми /buy для покупки",
+        "💰 <b>Цена: 390₽</b>",
+        reply_markup=keyboard,
         parse_mode="HTML"
     )
+
+
+@dp.callback_query(F.data == "buy_guide")
+async def callback_buy_guide(callback: types.CallbackQuery):
+    """Обработчик нажатия кнопки Купить"""
+    await callback.answer()
+    
+    try:
+        user_id = callback.from_user.id
+        
+        # Создаем уникальный ID платежа
+        idempotence_key = str(uuid.uuid4())
+        
+        # Создаем платеж в YooKassa
+        payment = Payment.create({
+            "amount": {
+                "value": str(GUIDE_PRICE),
+                "currency": "RUB"
+            },
+            "confirmation": {
+                "type": "redirect",
+                "return_url": f"https://t.me/psychology_guidebot"
+            },
+            "capture": True,
+            "description": "Гайд: 7 дней к внутреннему спокойствию",
+            "metadata": {
+                "user_id": str(user_id),
+                "product": "guide"
+            }
+        }, idempotence_key)
+        
+        # Сохраняем платеж
+        pending_payments[payment.id] = user_id
+        
+        # Получаем ссылку на оплату
+        confirmation_url = payment.confirmation.confirmation_url
+        
+        # Создаем кнопку для оплаты
+        keyboard = InlineKeyboardMarkup(inline_keyboard=[
+            [InlineKeyboardButton(text="💳 Оплатить 390₽", url=confirmation_url)],
+            [InlineKeyboardButton(text="❓ Проверить оплату", callback_data=f"check_{payment.id}")]
+        ])
+        
+        await callback.message.answer(
+            "💳 <b>Оплата гайда</b>\n\n"
+            f"Стоимость: <b>{GUIDE_PRICE}₽</b>\n\n"
+            "Нажми кнопку ниже для оплаты.\n"
+            "После оплаты нажми <b>\"Проверить оплату\"</b> чтобы получить гайд.",
+            reply_markup=keyboard,
+            parse_mode="HTML"
+        )
+        
+        logger.info(f"Платёж создан для пользователя {user_id}: {payment.id}")
+        
+    except Exception as e:
+        logger.error(f"Ошибка при создании платежа: {e}")
+        await callback.message.answer(
+            "😔 Произошла ошибка при создании платежа. Попробуй позже."
+        )
 
 
 @dp.message(Command("buy"))
