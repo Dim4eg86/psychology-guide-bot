@@ -24,7 +24,7 @@ else:
     print("⚠️ YooKassa credentials not found")
 
 # Цена и файл гайда
-GUIDE_PRICE = 5  # рублей (ТЕСТОВАЯ ЦЕНА)
+GUIDE_PRICE = 390  # рублей
 GUIDE_FILE_PATH = "/app/guide.pdf"
 
 # Логирование
@@ -43,7 +43,7 @@ pending_payments = {}
 async def cmd_start(message: types.Message):
     """Приветственное сообщение"""
     keyboard = InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text="💳 Купить за 5₽", callback_data="buy_guide")]
+        [InlineKeyboardButton(text="💳 Купить за 390₽", callback_data="buy_guide")]
     ])
     
     await message.answer(
@@ -51,7 +51,7 @@ async def cmd_start(message: types.Message):
         "🌸 <b>7 дней к внутреннему спокойствию в отношениях</b>\n\n"
         "Одна практика в день. 10-15 минут. Неделя на то, чтобы "
         "перестать жить его жизнью и вернуться к своей.\n\n"
-        "💰 <b>Цена: 5₽ (тестовая)</b>",
+        "💰 <b>Цена: 390₽</b>",
         reply_markup=keyboard,
         parse_mode="HTML"
     )
@@ -94,7 +94,7 @@ async def callback_buy_guide(callback: types.CallbackQuery):
         
         # Создаем кнопку для оплаты
         keyboard = InlineKeyboardMarkup(inline_keyboard=[
-            [InlineKeyboardButton(text="💳 Оплатить 5₽", url=confirmation_url)],
+            [InlineKeyboardButton(text="💳 Оплатить 390₽", url=confirmation_url)],
             [InlineKeyboardButton(text="❓ Проверить оплату", callback_data=f"check_{payment.id}")]
         ])
         
@@ -151,7 +151,7 @@ async def cmd_buy(message: types.Message):
         
         # Создаем кнопку для оплаты
         keyboard = InlineKeyboardMarkup(inline_keyboard=[
-            [InlineKeyboardButton(text="💳 Оплатить 5₽", url=confirmation_url)],
+            [InlineKeyboardButton(text="💳 Оплатить 390₽", url=confirmation_url)],
             [InlineKeyboardButton(text="❓ Проверить оплату", callback_data=f"check_{payment.id}")]
         ])
         
