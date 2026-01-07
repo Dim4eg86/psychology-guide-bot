@@ -1,12 +1,13 @@
 import asyncio
 import logging
+import os
 from aiogram import Bot, Dispatcher, types, F
 from aiogram.filters import Command
 from aiogram.types import LabeledPrice, PreCheckoutQuery, FSInputFile
 
-# Настройки
-BOT_TOKEN = "8578897112:AAHp20pdVSXTVjxmhxN82CubuKybx-MnNco"
-YOOKASSA_TOKEN = "live_ghw_QjfPTHOz06kkElqJGHqCZqAHxO9EtS1vdABx8BU"
+# Настройки из переменных окружения
+BOT_TOKEN = os.getenv("BOT_TOKEN")
+YOOKASSA_TOKEN = os.getenv("YOOKASSA_TOKEN")
 
 # Цена гайда
 GUIDE_PRICE = 390  # рублей
